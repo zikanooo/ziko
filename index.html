@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>プロフィール & ソーシャルメディア</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&family=Oxanium:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    /* Reset and Base Styles */
+    * {
+      box-sizing: border-box;
+      /* Gunakan will-change untuk memberitahu browser tentang animasi */
+      will-change: transform, opacity, filter, box-shadow, border-color;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Noto Sans JP', 'Oxanium', sans-serif;
+      background: linear-gradient(135deg, #000B29, #001F3F, #003366); /* Static Gradient */
+      color: #E0F7FA;
+      text-align: center;
+      padding: 20px 15px;
+      overflow-x: hidden;
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      width: 100vw;
+    }
+
+    /* Cyber Grid Overlay */
+    body::after {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-image: linear-gradient(0deg, transparent 97%, rgba(0,255,255,0.08) 97%), /* Opacity sedikit dikurangi */
+                          linear-gradient(90deg, transparent 97%, rgba(0,255,255,0.08) 97%);
+        background-size: 40px 40px;
+        opacity: 0.7; /* Opacity dikurangi */
+        pointer-events: none;
+        z-index: -2;
+    }
+
+    /* Subtle Data Flow / Matrix Effect */
+    body::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      /* Ukuran background lebih besar, mengurangi frekuensi render */
+      background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><text x="0" y="15" fill="rgba(0,255,255,0.04)" font-family="monospace" font-size="16">01</text><text x="10" y="5" fill="rgba(0,255,255,0.04)" font-family="monospace" font-size="16">10</text><text x="5" y="10" fill="rgba(0,255,255,0.04)" font-family="monospace" font-size="11">11</text></svg>');
+      background-size: 35px 35px; /* Ukuran diperbesar */
+      opacity: 0.4; /* Opacity dikurangi */
+      z-index: -1;
+      pointer-events: none;
+    }
+
+    /* Heading Styles (Hologram Effect) */
+    h1 {
+      font-family: 'Oxanium', sans-serif;
+      font-size: 2.5rem;
+      margin-bottom: 35px;
+      color: #00FFFF;
+      text-shadow: 0 0 10px rgba(0, 255, 255, 0.7), 0 0 20px rgba(0, 255, 255, 0.4); /* Shadow sedikit dikurangi */
+      letter-spacing: 2px;
+      position: relative;
+      z-index: 1;
+      /* Animasi Glitch dipertahankan, tapi durasi float sedikit dikurangi */
+      animation: floatText 2.8s infinite alternate cubic-bezier(0.68, -0.55, 0.265, 1.55), glitchText 0.6s infinite alternate linear;
+      background: linear-gradient(45deg, #00FFFF, #8A2BE2, #FF00FF);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      padding: 5px 0;
+      will-change: transform, text-shadow; /* Memberitahu browser tentang perubahan ini */
+    }
+
+    @keyframes floatText {
+        0% { transform: translateY(0px) rotateZ(0deg) scale(1); opacity: 1; }
+        50% { transform: translateY(-7px) rotateZ(0.4deg) scale(1.005); opacity: 0.98; } /* Gerakan sedikit disederhanakan */
+        100% { transform: translateY(0px) rotateZ(0deg) scale(1); opacity: 1; }
+    }
+
+    @keyframes glitchText {
+      0% { text-shadow: 0 0 10px rgba(0, 255, 255, 0.7), 0 0 20px rgba(0, 255, 255, 0.4), 1px 1px 0px rgba(255,0,0,0.2); } /* Offset shadow dikurangi */
+      25% { text-shadow: 0 0 10px rgba(0, 255, 255, 0.7), 0 0 20px rgba(0, 255, 255, 0.4), -1px -1px 0px rgba(0,255,0,0.2); }
+      50% { text-shadow: 0 0 10px rgba(0, 255, 255, 0.7), 0 0 20px rgba(0, 255, 255, 0.4), 1px -1px 0px rgba(0,0,255,0.2); }
+      75% { text-shadow: 0 0 10px rgba(0, 255, 255, 0.7), 0 0 20px rgba(0, 255, 255, 0.4), -1px 1px 0px rgba(255,255,0,0.2); }
+      100% { text-shadow: 0 0 10px rgba(0, 255, 255, 0.7), 0 0 20px rgba(0, 255, 255, 0.4), 0px 0px 0px rgba(0,255,255,0.2); }
+    }
+
+    /* Profile Image */
+    .profil-img {
+      width: 160px;
+      height: 160px;
+      border-radius: 50%;
+      object-fit: cover;
+      box-shadow: 0 0 8px rgba(0, 255, 255, 0.5), 0 0 15px rgba(255, 0, 255, 0.3), inset 0 0 4px rgba(0, 255, 255, 0.2); /* Shadow dikurangi */
+      position: relative;
+      z-index: 1;
+      animation: floatEffect 3.2s infinite alternate cubic-bezier(0.445, 0.05, 0.55, 0.95), pulseBorder 2.3s infinite alternate ease-in-out; /* Durasi sedikit disesuaikan */
+      transition: transform 0.5s cubic-bezier(0.19, 1, 0.22, 1), box-shadow 0.5s cubic-bezier(0.19, 1, 0.22, 1); /* Transisi hover sedikit lebih cepat */
+      will-change: transform, box-shadow, border-color;
+    }
+
+    .profil-img:hover {
+      transform: scale(1.08) rotateY(8deg); /* Skala dan rotasi sedikit dikurangi */
+      box-shadow: 0 0 18px rgba(0, 255, 255, 0.8), 0 0 35px rgba(255, 0, 255, 0.6), inset 0 0 8px rgba(0, 255, 255, 0.4); /* Glow disesuaikan */
+    }
+
+    @keyframes floatEffect {
+      0% { transform: translateY(0px) rotateZ(0deg); }
+      50% { transform: translateY(-8px) rotateZ(-0.4deg); } /* Gerakan sedikit disederhanakan */
+      100% { transform: translateY(0px) rotateZ(0deg); }
+    }
+
+    @keyframes pulseBorder {
+      0% { border: 2px solid rgba(0, 255, 255, 0.6); box-shadow: 0 0 8px rgba(0, 255, 255, 0.5); }
+      50% { border: 2px solid rgba(255, 0, 255, 0.8); box-shadow: 0 0 15px rgba(255, 0, 255, 0.7); }
+      100% { border: 2px solid rgba(0, 255, 255, 0.6); box-shadow: 0 0 8px rgba(0, 255, 255, 0.5); }
+    }
+
+    /* Button Base Style (Sleek Anime UI Button) */
+    .anime-btn {
+      background-color: rgba(0, 0, 0, 0.7);
+      color: #00FFFF;
+      border: 1px solid #00FFFF;
+      padding: 12px 30px;
+      margin: 8px;
+      font-size: 17px;
+      border-radius: 6px;
+      cursor: pointer;
+      box-shadow: 0 0 7px rgba(0, 255, 255, 0.4), inset 0 0 3px rgba(0, 255, 255, 0.2); /* Shadow dikurangi */
+      font-weight: 600;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      position: relative;
+      overflow: hidden;
+      z-index: 1;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: calc(100% - 30px);
+      max-width: 320px;
+      font-family: 'Oxanium', sans-serif;
+      transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1); /* Transisi hover sedikit lebih cepat */
+      animation: buttonFloat 2.8s infinite alternate cubic-bezier(0.68, -0.55, 0.265, 1.55); /* Durasi sedikit dikurangi */
+      will-change: transform, box-shadow, background-color, color, border-color;
+    }
+
+    /* Stagger animation for buttons */
+    .anime-btn:nth-child(2) { animation-delay: 0.1s; }
+    .anime-btn:nth-child(3) { animation-delay: 0.2s; }
+    .anime-btn:nth-child(4) { animation-delay: 0.3s; }
+    .anime-btn:nth-child(5) { animation-delay: 0.4s; }
+
+    @keyframes buttonFloat {
+        0% { transform: translateY(0px) scale(1); }
+        50% { transform: translateY(-4px) scale(1.002); } /* Gerakan lebih halus */
+        100% { transform: translateY(0px) scale(1); }
+    }
+
+    .anime-btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 40%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(0, 255, 255, 0.3), transparent); /* Opacity dikurangi */
+      transform: skewX(-20deg);
+      transition: transform 0.5s cubic-bezier(0.23, 1, 0.32, 1); /* Transisi geser sedikit lebih cepat */
+      z-index: -1;
+    }
+
+    .anime-btn:hover::before {
+      transform: translateX(250%) skewX(-20deg);
+    }
+
+    .anime-btn:hover {
+      background-color: #00FFFF;
+      color: #000B29;
+      box-shadow: 0 0 15px #00FFFF, 0 0 25px rgba(0, 255, 255, 0.7); /* Glow disesuaikan */
+      transform: translateY(-2px) scale(1.01); /* Sedikit lebih kecil dari sebelumnya */
+      border-color: #FF00FF;
+      animation: none;
+    }
+
+    /* Button Icons */
+    .anime-btn img {
+        width: 22px;
+        height: 22px;
+        margin-right: 8px;
+        border-radius: 50%;
+        object-fit: cover;
+        transition: transform 0.3s cubic-bezier(0.23, 1, 0.32, 1); /* Transisi ikon sedikit lebih cepat */
+    }
+
+    .anime-btn:hover img {
+        transform: scale(1.15) rotate(360deg); /* Skala sedikit dikurangi */
+    }
+
+    /* Play/Pause Button - Energized Core */
+    #playPauseBtn {
+      background-color: rgba(138, 43, 226, 0.8); /* Opacity sedikit dikurangi */
+      border: 3px solid #00FFFF;
+      width: 65px;
+      height: 65px;
+      border-radius: 50%;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 25px auto;
+      box-shadow: 0 0 10px rgba(138, 43, 226, 0.7), 0 0 20px rgba(0, 255, 255, 0.6), inset 0 0 7px rgba(255, 255, 255, 0.3); /* Shadow dikurangi */
+      animation: pulsate 1.3s infinite alternate cubic-bezier(0.68, -0.55, 0.265, 1.55), rotateInner 3.5s infinite linear; /* Durasi sedikit dikurangi */
+      z-index: 1;
+      transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1); /* Transisi hover sedikit lebih cepat */
+      will-change: transform, box-shadow, background-color, border-color;
+    }
+
+    #playPauseBtn svg {
+      fill: #FFFFFF;
+      width: 32px;
+      height: 32px;
+      transition: transform 0.3s cubic-bezier(0.23, 1, 0.32, 1); /* Transisi ikon sedikit lebih cepat */
+    }
+
+    #playPauseBtn:hover {
+      background-color: #00FFFF;
+      box-shadow: 0 0 18px #00FFFF, 0 0 35px rgba(138, 43, 226, 0.8); /* Glow disesuaikan */
+      transform: scale(1.08); /* Skala sedikit dikurangi */
+      border-color: #FF00FF;
+    }
+
+    @keyframes pulsate {
+      0% { transform: scale(1); box-shadow: 0 0 10px rgba(138, 43, 226, 0.7), 0 0 20px rgba(0, 255, 255, 0.6), inset 0 0 7px rgba(255, 255, 255, 0.3); }
+      50% { transform: scale(1.04); box-shadow: 0 0 14px rgba(138, 43, 226, 0.8), 0 0 28px rgba(0, 255, 255, 0.7), inset 0 0 9px rgba(255, 255, 255, 0.4); }
+      100% { transform: scale(1); box-shadow: 0 0 10px rgba(138, 43, 226, 0.7), 0 0 20px rgba(0, 255, 255, 0.6), inset 0 0 7px rgba(255, 255, 255, 0.3); }
+    }
+
+    @keyframes rotateInner {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Page Containers - Anime UI Panels (Futuristic Interface Windows) */
+    .halaman {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: calc(100% - 30px);
+      max-width: 380px;
+      padding: 35px;
+      background-color: rgba(0, 0, 0, 0.6); /* Opacity background dikurangi */
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 255, 255, 0.3), 0 0 20px rgba(255, 0, 255, 0.2), inset 0 0 7px rgba(255, 255, 255, 0.07); /* Shadow dikurangi */
+      border: 2px solid;
+      border-image: linear-gradient(45deg, #00FFFF, #FF00FF, #8A2BE2) 1;
+      overflow: hidden;
+
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      
+      /* Durasi transisi halaman sedikit disesuaikan, tapi tetap halus */
+      transition: opacity 1.2s cubic-bezier(0.45, 0, 0.55, 1), /* Sedikit lebih cepat dari 1.5s */
+                  transform 1.2s cubic-bezier(0.45, 0, 0.55, 1),
+                  filter 1.2s cubic-bezier(0.45, 0, 0.55, 1),
+                  visibility 0s 1.2s; /* visibility berubah setelah semua transisi selesai */
+      transform: translate(-50%, -50%) scale(0.9); /* Ukuran awal sedikit lebih besar */
+      filter: blur(5px); /* Blur sedikit dikurangi */
+      will-change: transform, opacity, filter;
+    }
+
+    /* Active page state */
+    .halaman.aktif {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+      transform: translate(-50%, -50%) scale(1);
+      filter: blur(0);
+      
+      transition: opacity 1.2s cubic-bezier(0.45, 0, 0.55, 1),
+                  transform 1.2s cubic-bezier(0.45, 0, 0.55, 1),
+                  filter 1.2s cubic-bezier(0.45, 0, 0.55, 1),
+                  visibility 0s 0s;
+    }
+
+    /* Corner Accents - Dynamic Lines */
+    .halaman::before,
+    .halaman::after,
+    .halaman-top-right::before,
+    .halaman-bottom-left::before {
+        content: '';
+        position: absolute;
+        width: 28px; /* Ukuran sedikit dikurangi */
+        height: 28px; /* Ukuran sedikit dikurangi */
+        border: 1.8px solid; /* Ketebalan sedikit dikurangi */
+        opacity: 0.7; /* Opacity sedikit dikurangi */
+        z-index: 2;
+        pointer-events: none;
+        box-shadow: 0 0 7px rgba(0,255,255,0.5); /* Shadow sedikit dikurangi */
+        animation: cornerLines 1.8s infinite alternate cubic-bezier(0.68, -0.55, 0.265, 1.55), borderGlow 2.8s infinite alternate ease-in-out; /* Durasi sedikit disesuaikan */
+        transition: all 0.35s cubic-bezier(0.23, 1, 0.32, 1); /* Transisi sedikit lebih cepat */
+        will-change: transform, opacity, box-shadow, border-color;
+    }
+
+    .halaman::before { /* Top-left */
+        top: -4px; /* Offset sedikit dikurangi */
+        left: -4px; /* Offset sedikit dikurangi */
+        border-width: 2.5px 0 0 2.5px; /* Ketebalan sedikit dikurangi */
+        border-color: #00FFFF;
+        transform: translate(-9px, -9px) skewX(-4deg); /* Offset dan skew sedikit dikurangi */
+    }
+
+    .halaman::after { /* Bottom-right */
+        bottom: -4px;
+        right: -4px;
+        border-width: 0 2.5px 2.5px 0;
+        border-color: #FF00FF;
+        transform: translate(9px, 9px) skewX(4deg);
+        animation-delay: 0.2s;
+    }
+
+    .halaman-top-right::before { /* Top-right */
+        content: '';
+        position: absolute;
+        top: -4px;
+        right: -4px;
+        width: 28px;
+        height: 28px;
+        border: 1.8px solid;
+        border-width: 2.5px 2.5px 0 0;
+        border-color: #8A2BE2;
+        transform: translate(9px, -9px) skewY(-4deg);
+        animation: cornerLines 1.8s infinite alternate cubic-bezier(0.68, -0.55, 0.265, 1.55) reverse, borderGlow 2.8s infinite alternate ease-in-out reverse;
+        animation-delay: 0.4s;
+    }
+
+    .halaman-bottom-left::before { /* Bottom-left */
+        content: '';
+        position: absolute;
+        bottom: -4px;
+        left: -4px;
+        width: 28px;
+        height: 28px;
+        border: 1.8px solid;
+        border-width: 0 0 2.5px 2.5px;
+        border-color: #00FFFF;
+        transform: translate(-9px, 9px) skewY(4deg);
+        animation: cornerLines 1.8s infinite alternate cubic-bezier(0.68, -0.55, 0.265, 1.55), borderGlow 2.8s infinite alternate ease-in-out;
+        animation-delay: 0.6s;
+    }
+
+    @keyframes cornerLines {
+        0% { transform: scale(1) skewX(0deg); opacity: 0.7; box-shadow: 0 0 7px rgba(0,255,255,0.5); }
+        50% { transform: scale(1.03) skewX(1.5deg); opacity: 0.9; box-shadow: 0 0 12px rgba(0,255,255,0.8); } /* Menyesuaikan */
+        100% { transform: scale(1) skewX(0deg); opacity: 0.7; box-shadow: 0 0 7px rgba(0,255,255,0.5); }
+    }
+
+    @keyframes borderGlow {
+      0% { border-color: #00FFFF; box-shadow: 0 0 7px rgba(0, 255, 255, 0.5); }
+      50% { border-color: #FF00FF; box-shadow: 0 0 12px rgba(255, 0, 255, 0.7); }
+      100% { border-color: #00FFFF; box-shadow: 0 0 7px rgba(0, 255, 255, 0.5); }
+    }
+
+
+    /* Media Queries for better responsiveness */
+    @media (min-width: 400px) {
+        h1 {
+            font-size: 3rem;
+            letter-spacing: 3px;
+        }
+        .profil-img {
+            width: 190px;
+            height: 190px;
+        }
+        .anime-btn {
+            padding: 14px 35px;
+            font-size: 18px;
+            max-width: 350px;
+        }
+        .anime-btn img {
+            width: 25px;
+            height: 25px;
+        }
+        #playPauseBtn {
+            width: 75px;
+            height: 75px;
+        }
+        #playPauseBtn svg {
+            width: 38px;
+            height: 38px;
+        }
+        .halaman {
+            padding: 40px;
+            max-width: 420px;
+        }
+    }
+
+    /* Desktop adjustments for even larger screens if needed */
+    @media (min-width: 768px) {
+        body {
+            padding: 40px 20px;
+        }
+        .halaman {
+            max-width: 480px;
+            padding: 45px;
+        }
+        h1 {
+            font-size: 3.5rem;
+            letter-spacing: 4px;
+        }
+    }
+  </style>
+</head>
+<body>
+
+  <div id="halaman1" class="halaman aktif halaman-top-right halaman-bottom-left">
+    <h1>こんにちは、私の名前はZychoです。よろしくお願いします！</h1>
+    <img src="https://files.catbox.moe/11oldq.jpg" alt="プロフィール写真" class="profil-img">
+    <br>
+    <button class="anime-btn" onclick="pindahHalaman('halaman2')">
+        <svg fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-8.707l-3-3a1 1 0 00-1.414 1.414L10.586 9H7a1 1 0 100 2h3.586l-1.293 1.293a1 1 0 101.414 1.414l3-3a1 1 0 000-1.414z" clip-rule="evenodd"></path></svg>
+        もっと見る (More Info)
+    </button>
+    <br>
+    <audio id="audio" src="https://files.cloudkuimages.guru/audios/uU8eATLN.mp3" loop></audio>
+    <button id="playPauseBtn" onclick="toggleAudio()">
+      <svg id="playIcon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+    </button>
+  </div>
+
+  <div id="halaman2" class="halaman halaman-top-right halaman-bottom-left">
+    <h1>私のソーシャルメディア</h1>
+    <button class="anime-btn" onclick="window.open('https://www.tiktok.com/@zkno.co?_t=ZS-8yKDs5p06Hx&_r=1', '_blank')">
+        <img src="https://files.cloudkuimages.guru/images/pTmjq4oe.jpg" alt="TikTok Logo">
+        TikTok
+    </button><br>
+    <button class="anime-btn" onclick="window.open('https://www.instagram.com/zkno.co?igsh=dW9hNmZ0NDUxdTdp', '_blank')">
+        <img src="https://files.cloudkuimages.guru/images/VI015i6L.jpg" alt="Instagram Logo">
+        Instagram
+    </button><br>
+    <button class="anime-btn" onclick="window.open('https://chat.whatsapp.com/LkJUZo7KUMBLkWE0HKPsjn?mode=r_t', '_blank')">
+        <img src="https://files.cloudkuimages.guru/images/6ul2WyED.jpg" alt="WhatsApp Group Logo">
+        WhatsApp Group
+    </button><br>
+    <button class="anime-btn" onclick="window.open('https://whatsapp.com/channel/0029Vb5nqwX35fLz5NmS9J2N', '_blank')">
+        <img src="https://files.cloudkuimages.guru/images/6ul2WyED.jpg" alt="WhatsApp Channel Logo">
+        WhatsApp Channel
+    </button>
+    <br>
+    <button class="anime-btn" onclick="pindahHalaman('halaman1')">
+        <svg fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd"></path></svg>
+        戻る (Back)
+    </button>
+  </div>
+
+  <script>
+    // Navigasi antar halaman
+    function pindahHalaman(idTarget) {
+      const halamanAktifSaatIni = document.querySelector('.halaman.aktif');
+      const halamanTarget = document.getElementById(idTarget);
+
+      if (halamanAktifSaatIni) {
+        // Halaman saat ini memulai transisi keluar
+        halamanAktifSaatIni.classList.remove('aktif');
+        // Terapkan efek keluar: sedikit mengecil dan blur
+        halamanAktifSaatIni.style.transform = `translate(-50%, -50%) scale(0.9)`; // Kembali ke 0.9
+        halamanAktifSaatIni.style.filter = `blur(5px)`; // Kembali ke 5px blur
+        // Durasi transisi kembali ke 1.2s agar lebih responsif di mobile
+        halamanAktifSaatIni.style.transition = `opacity 1.2s cubic-bezier(0.45, 0, 0.55, 1),
+                                                transform 1.2s cubic-bezier(0.45, 0, 0.55, 1),
+                                                filter 1.2s cubic-bezier(0.45, 0, 0.55, 1),
+                                                visibility 0s 1.2s`; 
+
+        // Tunggu hingga transisi keluar selesai sebelum menampilkan halaman target
+        // Durasi delay disesuaikan dengan transisi (1200ms)
+        setTimeout(() => {
+          halamanTarget.classList.add('aktif');
+          // Reset transisi untuk halaman target agar langsung terlihat dan mulai efek masuk
+          halamanTarget.style.transition = `opacity 1.2s cubic-bezier(0.45, 0, 0.55, 1),
+                                            transform 1.2s cubic-bezier(0.45, 0, 0.55, 1),
+                                            filter 1.2s cubic-bezier(0.45, 0, 0.55, 1),
+                                            visibility 0s 0s`;
+          // Terapkan efek masuk: kembali ke ukuran normal dan hapus blur
+          halamanTarget.style.transform = `translate(-50%, -50%) scale(1)`;
+          halamanTarget.style.filter = `blur(0)`;
+        }, 1150); // Sedikit lebih pendek dari 1200ms
+      } else {
+        // Jika tidak ada halaman aktif (pertama kali load), langsung tampilkan halaman target
+        halamanTarget.classList.add('aktif');
+        halamanTarget.style.transition = `opacity 1.2s cubic-bezier(0.45, 0, 0.55, 1),
+                                          transform 1.2s cubic-bezier(0.45, 0, 0.55, 1),
+                                          filter 1.2s cubic-bezier(0.45, 0, 0.55, 1),
+                                          visibility 0s 0s`;
+        halamanTarget.style.transform = `translate(-50%, -50%) scale(1)`;
+        halamanTarget.style.filter = `blur(0)`;
+      }
+    }
+
+    // Audio & Play/Pause Icon
+    let isPlaying = false;
+    const audio = document.getElementById('audio');
+    const playIcon = document.getElementById('playIcon');
+
+    // Inisialisasi ikon saat halaman dimuat
+    document.addEventListener('DOMContentLoaded', () => {
+        audio.volume = 0.5; // Atur volume audio
+        playIcon.innerHTML = '<path d="M8 5v14l11-7z"/>'; // ▶️ ikon play
+    });
+
+    function toggleAudio() {
+      if (isPlaying) {
+        audio.pause();
+        playIcon.innerHTML = '<path d="M8 5v14l11-7z"/>'; // ▶️
+      } else {
+        audio.play().catch(error => {
+            console.log("Audio play diblokir oleh browser:", error);
+            // Tambahkan feedback visual ke user jika play gagal
+        });
+        playIcon.innerHTML = '<path d="M6 19h4V5H6zm8-14v14h4V5z"/>'; // ⏸️
+      }
+      isPlaying = !isPlaying;
+    }
+  </script>
+</body>
+</html>
